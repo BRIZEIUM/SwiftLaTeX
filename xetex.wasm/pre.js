@@ -145,28 +145,15 @@ function compileLaTeXRoutine() {
             'cmd': 'compile'
         }, [pdfArrayBuffer.buffer]);
     } else {
-        console.error("Compilation failed, with status code " + status);
-        self.postMessage({
-            'result': 'failed',
-            'status': status,
-            'log': self.memlog,
-            'cmd': 'compile'
-        });
-    }
-}
-
-function compileFormatRoutine() {
-    prepareExecutionContext();
-    let status = _compileFormat();
-    if (status === 0) {
         let pdfArrayBuffer = null;
         try {
-            let pdfurl = WORKROOT + "/xelatex.fmt";
+            let pdfurl = WORKROOT + "/" + self.mainfile.substr(0, self.mainfile.length - 4) + ".xdv";
+            _compileBibtex();
             pdfArrayBuffer = FS.readFile(pdfurl, {
                 encoding: 'binary'
             });
         } catch (err) {
-            console.error("Fetch content failed.");
+            console.error("Fetch content failed. " + pdfurl);
             status = -253;
             self.postMessage({
                 'result': 'failed',
@@ -176,6 +163,38 @@ function compileFormatRoutine() {
             });
             return;
         }
+        console.error("Compilation failed, with status code " + status);
+        self.postMessage({
+            'result': 'failed',
+            'status': status,
+            'log': self.memlog,
+            'pdf': pdfArrayBuffer.buffer,
+            'cmd': 'compile'
+        }, [pdfArrayBuffer.buffer]);
+    }
+}
+
+function compileFormatRoutine() {
+    prepareExecutionContext();
+    let status = _compileFormat();
+    let pdfArrayBuffer = null;
+    try {
+        let pdfurl = WORKROOT + "/xelatex.fmt";
+        pdfArrayBuffer = FS.readFile(pdfurl, {
+            encoding: 'binary'
+        });
+    } catch (err) {
+        console.error("Fetch content failed.");
+        status = -253;
+        self.postMessage({
+            'result': 'failed',
+            'status': status,
+            'log': self.memlog,
+            'cmd': 'compile'
+        });
+        return;
+    }
+    if (status === 0) {
         self.postMessage({
             'result': 'ok',
             'status': status,
@@ -189,8 +208,9 @@ function compileFormatRoutine() {
             'result': 'failed',
             'status': status,
             'log': self.memlog,
+            'pdf': pdfArrayBuffer.buffer,
             'cmd': 'compile'
-        });
+        }, [pdfArrayBuffer.buffer]);
     }
 }
 

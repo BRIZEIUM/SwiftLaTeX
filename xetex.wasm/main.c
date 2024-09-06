@@ -64,7 +64,7 @@ void uexit(int code) {
 #ifndef WEBASSEMBLY_BUILD
 int main(int argc, char **argv) {
 
-  haltonerrorp = 1;
+  haltonerrorp = 0;
   ac = argc;
   av = argv;
   // Parse Argument
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 char main_entry_file[MAXMAINFILENAME];
 
 int _compile() {
-  haltonerrorp = 1;
+  haltonerrorp = 0;
   dumpname = DEFAULT_DUMP_NAME;
   int fmtstrlen = strlen(DEFAULT_FMT_NAME);
   TEXformatdefault = xmalloc(fmtstrlen + 2);
